@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <script>
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harry & Co. — High Jewellery Collections</title>
+    <meta name="description" content="Discover Harry & Co. high jewellery collections. Exquisite rings, necklaces, bracelets, and earrings.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="lexcellence.css">
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              background: 'var(--bg-base)', 'background-shift': 'var(--bg-surface)', primary: 'var(--text-main)', muted: 'var(--text-muted)',
+              gold: { DEFAULT: 'var(--accent-gold)', dark: 'var(--accent-gold-dark)' }
+            },
+            fontFamily: { headline: ['"Playfair Display"', 'serif'], body: ['"Manrope"', 'sans-serif'] }
+          }
+        }
+      }
+    </script>
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-up { opacity: 0; animation: fadeUp 0.9s ease-out forwards; }
+        .animate-fade-up-delay-1 { opacity: 0; animation: fadeUp 0.9s ease-out 0.2s forwards; }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        
+        .nav-link { position: relative; display: inline-block; }
+        .nav-link::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0%; height: 1px; background-color: var(--accent-gold); transition: width 0.25s ease; }
+        .nav-link:hover::after { width: 100%; }
+        .nav-link:hover { color: var(--accent-gold); }
+        
+        .skeleton { background: var(--bg-surface); background-image: linear-gradient(90deg, var(--bg-surface) 0px, var(--bg-base) 40px, var(--bg-surface) 80px); background-size: 200% 100%; animation: shimmer 1.5s infinite linear; }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        
+        .fade-up-element { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+        .fade-up-element.visible { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body class="bg-[var(--bg-base)] text-[var(--text-main)] font-body min-h-screen transition-colors duration-500">
+
+    <!-- Navigation -->
+    <nav id="navbar" class="sticky top-0 w-full z-50 h-[60px] md:h-[72px] bg-[var(--bg-base)]/80 backdrop-blur-[24px] transition-all duration-300 border-b border-[var(--border-color)]">
+        <div class="w-full h-full px-[24px] md:px-[80px] flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 group relative z-50">
+                <svg class="w-[14px] h-[14px] text-[var(--accent-gold-dark)]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 12L12 22L22 12L12 2Z"/></svg>
+                <span class="font-headline text-[22px] text-[var(--accent-gold)] tracking-wide">Harry & Co.</span>
+            </a>
+            
+            <div class="hidden md:flex items-center gap-10 h-full">
+                <div class="group h-full flex items-center">
+                    <a href="jewellery.html" class="text-[var(--accent-gold)] font-body text-[14px] h-full flex items-center tracking-wide nav-link">Collections</a>
+                </div>
+                <div class="group h-full flex items-center">
+                    <a href="diamonds.html" class="text-[var(--text-main)] font-body text-[14px] hover:text-[var(--accent-gold)] transition-colors h-full flex items-center tracking-wide nav-link">Diamonds</a>
+                </div>
+                <a href="index.html#masterpieces" class="text-[var(--text-main)] font-body text-[14px] hover:text-[var(--accent-gold)] transition-colors nav-link">The Atelier</a>
+                <a href="index.html#collections" class="text-[var(--text-main)] font-body text-[14px] hover:text-[var(--accent-gold)] transition-colors nav-link">Heritage</a>
+            </div>
+
+            <div class="flex items-center gap-6 relative z-50">
+                <button id="theme-toggle" class="text-[var(--text-muted)] hover:text-[var(--accent-gold)] transition-colors">
+                    <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
+                    <i data-lucide="sun" class="w-5 h-5 block dark:hidden"></i>
+                </button>
+                <i data-lucide="search" class="w-5 h-5 text-[var(--text-muted)] hover:text-[var(--accent-gold)] cursor-pointer"></i>
+                <button id="mobile-menu-btn" class="w-6 h-6 text-[var(--text-muted)] flex md:hidden flex-col justify-center items-center gap-[5px]">
+                    <span class="block w-6 h-[1.5px] bg-current transition-transform duration-300"></span>
+                    <span class="block w-6 h-[1.5px] bg-current transition-opacity duration-300"></span>
+                    <span class="block w-6 h-[1.5px] bg-current transition-transform duration-300"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="w-full pt-[80px] pb-[40px] md:pt-[120px] md:pb-[80px] px-[24px] md:px-[80px] text-center">
+        <h1 class="font-headline text-[var(--text-main)] text-[2.5rem] md:text-[4rem] leading-tight mb-4 animate-fade-up">High Jewellery</h1>
+        <p class="font-body text-[14px] md:text-[16px] text-[var(--text-muted)] max-w-[600px] mx-auto animate-fade-up-delay-1">Explore our masterful collections. Every piece is an extraordinary testament to artistic expression and unparalleled craftsmanship.</p>
+    </header>
+
+    <!-- Rings -->
+    <section id="rings" class="w-full px-[24px] md:px-[80px] py-[60px] bg-[var(--bg-base)]">
+        <div class="max-w-[1600px] mx-auto w-full">
+            <h2 class="font-headline text-[2rem] text-[var(--text-main)] mb-8 fade-up-element border-b border-[var(--border-color)] pb-4">Exquisite Rings</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- 1 -->
+                <div class="flex flex-col group fade-up-element cursor-pointer lightbox-trigger">
+                    <div class="relative w-full aspect-[4/5] rounded-[4px] overflow-hidden mb-4 bg-[var(--bg-surface)]">
+                        <div class="absolute inset-0 skeleton z-0"></div>
+                        <img src="https://images.unsplash.com/photo-1605100804763-247f67b2548e?q=80&w=600&auto=format&fit=crop" loading="lazy" class="relative z-10 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onload="this.previousElementSibling.style.display='none'" />
+                    </div>
+                    <h3 class="font-headline text-[1.2rem] text-[var(--text-main)] mb-1">The Eternity Ring</h3>
+                    <p class="font-body text-[13px] text-[var(--text-muted)]">18k White Gold, Brilliant Diamonds</p>
+                </div>
+                <!-- 2 -->
+                <div class="flex flex-col group fade-up-element cursor-pointer lightbox-trigger" style="transition-delay: 0.1s">
+                    <div class="relative w-full aspect-[4/5] rounded-[4px] overflow-hidden mb-4 bg-[var(--bg-surface)]">
+                        <div class="absolute inset-0 skeleton z-0"></div>
+                        <img src="https://images.unsplash.com/photo-1599643478514-4a11011c2188?q=80&w=600&auto=format&fit=crop" loading="lazy" class="relative z-10 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onload="this.previousElementSibling.style.display='none'" />
+                    </div>
+                    <h3 class="font-headline text-[1.2rem] text-[var(--text-main)] mb-1">Solitaire Masterpiece</h3>
+                    <p class="font-body text-[13px] text-[var(--text-muted)]">Platinum, 3 Carat Center</p>
+                </div>
+                <!-- 3 -->
+                <div class="flex flex-col group fade-up-element cursor-pointer lightbox-trigger" style="transition-delay: 0.2s">
+                    <div class="relative w-full aspect-[4/5] rounded-[4px] overflow-hidden mb-4 bg-[var(--bg-surface)]">
+                        <div class="absolute inset-0 skeleton z-0"></div>
+                        <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=600&auto=format&fit=crop" loading="lazy" class="relative z-10 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onload="this.previousElementSibling.style.display='none'" />
+                    </div>
+                    <h3 class="font-headline text-[1.2rem] text-[var(--text-main)] mb-1">Halo Engagement Ring</h3>
+                    <p class="font-body text-[13px] text-[var(--text-muted)]">18k Rose Gold, Pink Diamond</p>
+                </div>
+                <!-- 4 -->
+                <div class="flex flex-col group fade-up-element cursor-pointer lightbox-trigger" style="transition-delay: 0.3s">
+                    <div class="relative w-full aspect-[4/5] rounded-[4px] overflow-hidden mb-4 bg-[var(--bg-surface)]">
+                        <div class="absolute inset-0 skeleton z-0"></div>
+                        <img src="https://images.unsplash.com/photo-1589330687747-19598a722ea5?q=80&w=600&auto=format&fit=crop" loading="lazy" class="relative z-10 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onload="this.previousElementSibling.style.display='none'" />
+                    </div>
+                    <h3 class="font-headline text-[1.2rem] text-[var(--text-main)] mb-1">The Vow Band</h3>
+                    <p class="font-body text-[13px] text-[var(--text-muted)]">Platinum, Channel Set Diamonds</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Necklaces -->
+    <section id="necklaces" class="w-full px-[24px] md:px-[80px] py-[60px] bg-[var(--bg-surface)] relative">
+        <div class="max-w-[1600px] mx-auto w-full">
+            <h2 class="font-headline text-[2rem] text-[var(--text-main)] mb-8 fade-up-element border-b border-[var(--border-color)] pb-4">Necklaces & Pendants</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="flex flex-col group fade-up-element cursor-pointer lightbox-trigger">
+                    <div class="relative w-full aspect-square rounded-[4px] overflow-hidden mb-4 bg-[var(--bg-deep)]">
+                        <div class="absolute inset-0 skeleton z-0"></div>
+                        <img src="https://images.unsplash.com/photo-1599643478514-4a11011c2188?q=80&w=600&auto=format&fit=crop" loading="lazy" class="relative z-10 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onload="this.previousElementSibling.style.display='none'" />
+                    </div>
+                    <h3 class="font-headline text-[1.2rem] text-[var(--text-main)] mb-1">Diamond Cascade</h3>
+                    <p class="font-body text-[13px] text-[var(--text-muted)]">18k White Gold, Cascading Diamonds</p>
+                </div>
+                <div class="flex flex-col group fade-up-element cursor-pointer lightbox-trigger" style="transition-delay: 0.1s">
+                    <div class="relative w-full aspect-square rounded-[4px] overflow-hidden mb-4 bg-[var(--bg-deep)]">
+                        <div class="absolute inset-0 skeleton z-0"></div>
+                        <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=600&auto=format&fit=crop" loading="lazy" class="relative z-10 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onload="this.previousElementSibling.style.display='none'" />
+                    </div>
+                    <h3 class="font-headline text-[1.2rem] text-[var(--text-main)] mb-1">The Heirloom Pendant</h3>
+                    <p class="font-body text-[13px] text-[var(--text-muted)]">18k Yellow Gold, Ruby Core</p>
+                </div>
+                <div class="flex flex-col group fade-up-element cursor-pointer lightbox-trigger" style="transition-delay: 0.2s">
+                    <div class="relative w-full aspect-square rounded-[4px] overflow-hidden mb-4 bg-[var(--bg-deep)]">
+                        <div class="absolute inset-0 skeleton z-0"></div>
+                        <img src="https://images.unsplash.com/photo-1589330687747-19598a722ea5?q=80&w=600&auto=format&fit=crop" loading="lazy" class="relative z-10 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onload="this.previousElementSibling.style.display='none'" />
+                    </div>
+                    <h3 class="font-headline text-[1.2rem] text-[var(--text-main)] mb-1">Sublime Rivière</h3>
+                    <p class="font-body text-[13px] text-[var(--text-muted)]">Platinum, Graduated Diamonds</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="w-full px-[24px] md:px-[80px] pt-[80px] pb-[40px] bg-[var(--bg-surface)]">
+        <div class="max-w-[1600px] mx-auto w-full border-t border-[var(--border-color)] pt-[24px] flex justify-between items-center gap-4">
+            <span class="font-body text-[11px] text-[var(--text-muted)]">© 2026 Harry & Co. Joaillerie.</span>
+        </div>
+    </footer>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="fixed inset-0 z-[100000] bg-black/95 opacity-0 pointer-events-none transition-opacity duration-500 flex flex-col items-center justify-center backdrop-blur-md">
+        <button id="lightbox-close" class="absolute top-6 right-6 text-white hover:text-[var(--accent-gold)] transition-colors p-2"><i data-lucide="x" class="w-8 h-8"></i></button>
+        <img id="lightbox-img" src="" class="max-w-[90vw] max-h-[85vh] object-contain rounded-[4px] shadow-2xl transition-transform duration-300 scale-95" />
+        <div class="absolute top-1/2 left-0 w-full flex justify-between px-4 md:px-12 -translate-y-1/2 pointer-events-none">
+            <button id="lightbox-prev" class="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white backdrop-blur-sm transition-all pointer-events-auto hover:-translate-x-1"><i data-lucide="chevron-left" class="w-6 h-6"></i></button>
+            <button id="lightbox-next" class="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white backdrop-blur-sm transition-all pointer-events-auto hover:translate-x-1"><i data-lucide="chevron-right" class="w-6 h-6"></i></button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        lucide.createIcons();
+
+        // Theme Toggle
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const htmlEl = document.documentElement;
+        
+        if (localStorage.getItem('theme') === 'light') {
+            htmlEl.classList.remove('dark');
+        } else {
+            htmlEl.classList.add('dark');
+        }
+
+        themeToggleBtn?.addEventListener('click', () => {
+            htmlEl.classList.toggle('dark');
+            localStorage.setItem('theme', htmlEl.classList.contains('dark') ? 'dark' : 'light');
+        });
+
+        // GSAP ScrollTrigger Animations — with IntersectionObserver fallback
+        if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            gsap.registerPlugin(ScrollTrigger);
+            gsap.utils.toArray('.fade-up-element').forEach(el => {
+                gsap.fromTo(el,
+                    { y: 50, opacity: 0 },
+                    { y: 0, opacity: 1, duration: 1.2, ease: 'power3.out',
+                      scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' } }
+                );
+            });
+        } else {
+            // Fallback: plain IntersectionObserver
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+            }, { threshold: 0.12 });
+            document.querySelectorAll('.fade-up-element').forEach(el => io.observe(el));
+        }
+
+        // Lightbox Logic
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxClose = document.getElementById('lightbox-close');
+        const lightboxPrev = document.getElementById('lightbox-prev');
+        const lightboxNext = document.getElementById('lightbox-next');
+        let currentImages = [];
+        let currentIndex = 0;
+
+        document.querySelectorAll('.lightbox-trigger').forEach(trigger => {
+            trigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = trigger.closest('section');
+                currentImages = Array.from(section.querySelectorAll('.lightbox-trigger img'));
+                currentIndex = currentImages.indexOf(trigger.querySelector('img'));
+                
+                updateLightboxImage();
+                lightbox.classList.remove('opacity-0', 'pointer-events-none');
+            });
+        });
+
+        function updateLightboxImage() {
+            if(currentImages.length > 0) {
+                lightboxImg.style.transform = 'scale(0.95)';
+                lightboxImg.style.opacity = '0.5';
+                setTimeout(() => {
+                    lightboxImg.src = currentImages[currentIndex].src;
+                    lightboxImg.style.transform = 'scale(1)';
+                    lightboxImg.style.opacity = '1';
+                }, 200);
+            }
+        }
+
+        lightboxClose?.addEventListener('click', () => lightbox.classList.add('opacity-0', 'pointer-events-none'));
+        lightboxPrev?.addEventListener('click', () => {
+            currentIndex = (currentIndex > 0) ? currentIndex - 1 : currentImages.length - 1;
+            updateLightboxImage();
+        });
+        lightboxNext?.addEventListener('click', () => {
+            currentIndex = (currentIndex < currentImages.length - 1) ? currentIndex + 1 : 0;
+            updateLightboxImage();
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') lightbox.classList.add('opacity-0', 'pointer-events-none');
+        });
+    </script>
+</body>
+</html>
